@@ -7,7 +7,7 @@ import TaskList from '@/components/TaskList'
 import TaskListPagination from '@/components/TaskListPagination'
 import React, { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import axios from 'axios'
+import api from '@/lib/axios'
 
 const HomePage = () => {
   const [taskBuffer, setTaskBuffer] = useState([])
@@ -25,13 +25,14 @@ const HomePage = () => {
   //logic lấy nv từ backend
   const fetchTasks = async () => {
     try {
-      const res = await axios.get('http://localhost:5001/api/tasks')
+      const res = await api.get('/tasks')
       setTaskBuffer(res.data.tasks)
       setActiveTaskCount(res.data.activeCount)
-      setCompleteTaskCount(res.data.completeCount)
+      setCompleteTaskCount(res.data.completedCount); 
+
     } catch (error) {
-      console.error('Error fetching tasks:', error)
-      toast.error('Failed to fetch tasks. Please try again later.')
+      console.error('Lỗi xảy ra khi truy xuất tasks:', error)
+      toast.error('Lỗi xảy ra khi truy xuất tasks.')
     }
   }
 
@@ -40,16 +41,17 @@ const HomePage = () => {
   }
 
   //biến lọc nv theo trạng thái
-  const filteredTasks = taskBuffer.filter((task) => {
-    switch (filter) {
-      case "active":
-        return task.status === "active";
-      case "complete":
-        return task.status === "complete";
-      default:
-        return true;
-    }
-  });
+const filteredTasks = taskBuffer.filter((task) => {
+  switch (filter) {
+    case "active":
+      return task.status === "active";
+    case "completed": 
+      return task.status === "completed";
+    default:
+      return true;
+  }
+});
+
 
   return (
     <div className="min-h-screen w-full bg-white relative text-gray-800">
@@ -73,15 +75,15 @@ const HomePage = () => {
             <AddTask handleNewTaskAdded={handleTaskChanged} />
 
             {/* Thống kê và bộ loc , phải truyền đúng bên StartAndFilter*/} 
-            <StartAndFilter
-              filter={filter}
-              setFilter={setFilter}
-              activeTasksCount={activeTaskCount} 
-              completedTasksCount={completeTaskCount}
-            />
+        <StartAndFilter
+  filter={filter}
+  setFilter={setFilter}
+  activeTasksCount={activeTaskCount} 
+  completedTasksCount={completeTaskCount} 
+/>
 
             {/* Danh sách nhiệm vụ */}
-            <TaskList filteredTasks={filteredTasks} filter={filter} />
+            <TaskList filteredTasks={filteredTasks} filter={filter} handleTaskChanged={handleTaskChanged} />
 
             {/* Phần trang và lọc theo ngày */}
             <div className="flex flex-col items-center justify-between gap-6 sm:flex-row">

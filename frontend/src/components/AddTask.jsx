@@ -4,7 +4,7 @@ import { Input } from './ui/input.jsx'
 import { Button } from './ui/button.jsx'
 import { Plus } from 'lucide-react'
 import { toast } from 'sonner'
-import axios from 'axios'
+import api from '@/lib/axios.js'
 
 const AddTask = ({ handleNewTaskAdded }) => {
   const [newTaskTitle, setNewTaskTitle] = useState('');
@@ -13,7 +13,7 @@ const AddTask = ({ handleNewTaskAdded }) => {
     if (newTaskTitle.trim()) 
     {
       try {
-        await axios.post('http://localhost:5001/api/tasks', { title: newTaskTitle});
+        await api.post('/tasks', { title: newTaskTitle});
         toast.success(`Nhiệm vụ "${newTaskTitle}" đã được thêm thành công!`);
         handleNewTaskAdded();
       } catch (error) {
@@ -50,6 +50,7 @@ const AddTask = ({ handleNewTaskAdded }) => {
         size='xl'
         className="p-6"
         onClick={addTask}
+        disabled={!newTaskTitle.trim()}
       >
         <Plus className='size-5'/>
         Thêm Nhiệm Vụ
